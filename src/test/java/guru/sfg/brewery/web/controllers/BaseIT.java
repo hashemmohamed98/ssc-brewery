@@ -8,7 +8,9 @@ import guru.sfg.brewery.repositories.BeerRepository;
 import guru.sfg.brewery.repositories.CustomerRepository;
 import guru.sfg.brewery.services.BeerService;
 import guru.sfg.brewery.services.BreweryService;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.provider.Arguments;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,7 +24,7 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
  *
  * @author #EM
  */
-public class BaseIT {
+public abstract class BaseIT {
      @Autowired   
     WebApplicationContext wac;
     
@@ -50,4 +52,19 @@ mockMvc= MockMvcBuilders
         .build();
 
 }
+public static Stream <Arguments> getStreamAdminCustomer(){
+
+    return Stream.of(Arguments.of("spring","guru"),Arguments.of("scott","tiger"));
+}
+
+public static Stream <Arguments> getStreamAllUsers(){
+
+    return Stream.of(Arguments.of("spring","guru"),Arguments.of("scott","tiger"),Arguments.of("user","password"));
+}
+
+public static Stream <Arguments> getStreamNotAdmin(){
+
+    return Stream.of(Arguments.of("scott","tiger"),Arguments.of("user","password"));
+}
+
 }

@@ -45,7 +45,7 @@ private final  UserRepository userRepository;
    
         if(authorities!=null && authorities.size()>0){
         
-        return authorities.stream().map(Authority::getRole)
+        return authorities.stream().map(Authority::getPermission)
                 .map(SimpleGrantedAuthority:: new)
                 .collect(Collectors.toSet());
         }

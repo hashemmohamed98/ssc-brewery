@@ -18,6 +18,7 @@
 package guru.sfg.brewery.web.controllers;
 
 import guru.sfg.brewery.domain.Brewery;
+import guru.sfg.brewery.security.perms.BreweryReadPermission;
 import guru.sfg.brewery.services.BreweryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 
 @RequiredArgsConstructor
@@ -35,12 +37,13 @@ import java.util.List;
 public class BreweryController {
 
     private final BreweryService breweryService;
-
-    @GetMapping({"/breweries", "/breweries/index", "/breweries/index.html", "/breweries.html"})
+   @BreweryReadPermission
+   @GetMapping({"/breweries", "/breweries/index", "/breweries/index.html", "/breweries.html"})
     public String listBreweries(Model model) {
         model.addAttribute("breweries", breweryService.getAllBreweries());
         return "breweries/index";
     }
+   @BreweryReadPermission
     @GetMapping("/api/v1/breweries")
     public @ResponseBody
     List<Brewery> getBreweriesJson(){
