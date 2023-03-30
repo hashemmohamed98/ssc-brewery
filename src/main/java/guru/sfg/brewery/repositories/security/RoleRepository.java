@@ -5,6 +5,7 @@
 package guru.sfg.brewery.repositories.security;
 
 import guru.sfg.brewery.domain.security.Role;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /**
@@ -12,5 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @author #EM
  */
 public interface RoleRepository extends JpaRepository<Role, Integer> {
+
+    public Optional <Role> findByName(String customer);
     
 }

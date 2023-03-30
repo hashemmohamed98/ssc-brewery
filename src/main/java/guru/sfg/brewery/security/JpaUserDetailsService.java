@@ -34,24 +34,9 @@ private final  UserRepository userRepository;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
     log.debug("Loading User Credintials Via JPA");
-        User user= userRepository.findByUsername(username).orElseThrow(() ->{
+       return userRepository.findByUsername(username).orElseThrow(() ->{
         return new  UsernameNotFoundException("User name: "+username +" does not exist");
         });
-        return new  org.springframework.security.core.userdetails.User(user.getUsername(),user.getPassword(),user.getEnabled(),user.getAccountNonExpired(),user.getAccountNonLocked(),user.getCredentialsNonExpired(),
-                convertToSpringAuthority(user.getAuthorities()));
-    }
-
-    private Collection<? extends GrantedAuthority> convertToSpringAuthority(Set<Authority> authorities) {
-   
-        if(authorities!=null && authorities.size()>0){
-        
-        return authorities.stream().map(Authority::getPermission)
-                .map(SimpleGrantedAuthority:: new)
-                .collect(Collectors.toSet());
-        }
-        else{
-        return new HashSet<>();
-        }
     }
     
 }
