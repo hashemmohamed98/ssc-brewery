@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import org.springframework.test.annotation.Rollback;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -45,7 +46,7 @@ public class CustomerControllerIT extends BaseIT {
    @Rollback
    @Test
 void processCreationForm() throws Exception {
-mockMvc.perform(post("/customers/new")
+mockMvc.perform(post("/customers/new").with(csrf())
         .param("Customer Name", " Foo Customer2")
         .with(httpBasic("spring","guru")))
         .andExpect(status().is3xxRedirection());
@@ -63,7 +64,7 @@ mockMvc.perform(post("/customers/new")
 } 
 @Test
 void processCreationFormNoAuth() throws Exception {
-mockMvc.perform(post("/customers/new")
+mockMvc.perform(post("/customers/new").with(csrf())
         .param("Customer Name", " Foo Customer2"))
         .andExpect(status().isUnauthorized());
 

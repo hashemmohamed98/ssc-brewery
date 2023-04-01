@@ -21,6 +21,7 @@ import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
+import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
@@ -47,6 +48,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //       authfilter.setAuthenticationManager(auth);
 //       return authfilter;
 //   }     
+    
+    //needed for use with spring Data JPA sPEL  
+    @Bean
+    public SecurityEvaluationContextExtension securityEvaluationContextExtension(){
+    return new SecurityEvaluationContextExtension();
+    
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         
@@ -78,10 +86,21 @@ http
         .anyRequest()
         .authenticated()
         .and()
-        .formLogin()
-        .and()
+        .formLogin(loginConfigurer  ->{
+        loginConfigurer.loginProcessingUrl("/login")
+        .loginPage("/").permitAll()
+        .successForwardUrl("/")
+        .defaultSuccessUrl("/")
+        .failureUrl("/?error")        ;
+        })
+        .logout((logoutConfigurer) -> {
+         logoutConfigurer
+                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout","GET"))
+         .logoutSuccessUrl("/?logout")
+         .permitAll();
+        })
         .httpBasic()
-        .and().csrf().disable();
+        .and().csrf().ignoringAntMatchers("/h2-console/**","/api/**");
 http.headers().frameOptions().sameOrigin();
     }
   

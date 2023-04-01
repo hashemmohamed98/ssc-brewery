@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,27 +179,52 @@ class BeerOrderControllerTest extends BaseIT {
                 .andExpect(status().is2xxSuccessful());
     }
     
+       @Transactional
+    @WithUserDetails(DefaultBreweryLoader.DUNEDIN_USER)
+    @Test
+    void getByOrderIdCustomerNOTAuth() throws Exception {
+        BeerOrder beerOrder = stPeteCustomer.getBeerOrders().stream().findFirst().orElseThrow();
+        mockMvc.perform(get(API_ROOT + stPeteCustomer.getId() + "/orders/" + beerOrder.getId()))
+                .andExpect(status().isForbidden());
+    }
+    
+
+    
+@Transactional
+    @Test
+    void pickUpOrderNotAuth() throws Exception {
+    BeerOrder beerOrder =stPeteCustomer.getBeerOrders().stream().findFirst().orElseThrow();
+    mockMvc.perform(put(API_ROOT+stPeteCustomer.getId() +"/orders/" + beerOrder.getId()+"/pickup")).andExpect(status().isUnauthorized());
+    }
     
     
-    @Disabled
+    @Transactional
+    @WithUserDetails(value = "spring")
     @Test
-    void pickUpOrderNotAuth() {
+    void pickUpOrderAdminUser() throws Exception {
+         BeerOrder beerOrder =stPeteCustomer.getBeerOrders().stream().findFirst().orElseThrow();
+    mockMvc.perform(put(API_ROOT+stPeteCustomer.getId() +"/orders/" + beerOrder.getId()+"/pickup")).andExpect(status().isNoContent());
     }
-
-    @Disabled
+    
+    
+    @Transactional
+    @WithUserDetails(DefaultBreweryLoader.KEYWEST_USER)
     @Test
-    void pickUpOrderNotAdminUser() {
+    void pickUpOrderCustomerUserAUTH() throws Exception {
+        BeerOrder beerOrder =keyWestCustomer.getBeerOrders().stream().findFirst().orElseThrow();
+    mockMvc.perform(put(API_ROOT+keyWestCustomer.getId() +"/orders/" + beerOrder.getId()+"/pickup")).andExpect(status().isNoContent());
+    
     }
-
-    @Disabled
+    
+    
+    @Transactional
+    @WithUserDetails(DefaultBreweryLoader.STPETE_USER)
     @Test
-    void pickUpOrderCustomerUserAUTH() {
+    void pickUpOrderCustomerUserNOT_AUTH() throws Exception {
+          BeerOrder beerOrder =dunedinCustomer.getBeerOrders().stream().findFirst().orElseThrow();
+    mockMvc.perform(put(API_ROOT+dunedinCustomer.getId() +"/orders/" + beerOrder.getId()+"/pickup")).andExpect(status().isForbidden());
     }
-
-    @Disabled
-    @Test
-    void pickUpOrderCustomerUserNOT_AUTH() {
-    }
+    
 
     private BeerOrderDto buildOrderDto(Customer customer, UUID beerId) {
         List<BeerOrderLineDto> orderLines = Arrays.asList(BeerOrderLineDto.builder()
