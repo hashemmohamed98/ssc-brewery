@@ -6,6 +6,7 @@ package guru.sfg.brewery.config;
 import guru.sfg.brewery.security.RestHeaderAuthFilter;
 import guru.sfg.brewery.security.RestUrlParamsAuthfilter;
 import guru.sfg.brewery.security.SfgPasswordEncoderFactories;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.LdapShaPasswordEncoder;
@@ -23,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
@@ -30,6 +33,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
  *
  * @author #EM
  */
+@RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -49,6 +53,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //       return authfilter;
 //   }     
     
+    private final UserDetailsService userDetailsService;
+    private final PersistentTokenRepository tokenRepository;
     //needed for use with spring Data JPA sPEL  
     @Bean
     public SecurityEvaluationContextExtension securityEvaluationContextExtension(){
@@ -100,7 +106,9 @@ http
          .permitAll();
         })
         .httpBasic()
-        .and().csrf().ignoringAntMatchers("/h2-console/**","/api/**");
+        .and().csrf().ignoringAntMatchers("/h2-console/**","/api/**").and()
+//        .rememberMe().key("sfg-key").userDetailsService(userDetailsService);
+        .rememberMe().tokenRepository(tokenRepository).userDetailsService(userDetailsService);
 http.headers().frameOptions().sameOrigin();
     }
   
