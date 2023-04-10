@@ -6,6 +6,8 @@ package guru.sfg.brewery.config;
 import guru.sfg.brewery.security.RestHeaderAuthFilter;
 import guru.sfg.brewery.security.RestUrlParamsAuthfilter;
 import guru.sfg.brewery.security.SfgPasswordEncoderFactories;
+import guru.sfg.brewery.security.google.Google2faFilter;
+import javax.websocket.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,7 @@ import org.springframework.security.crypto.password.StandardPasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.session.SessionManagementFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 
@@ -55,6 +58,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     
     private final UserDetailsService userDetailsService;
     private final PersistentTokenRepository tokenRepository;
+    private final Google2faFilter google2faFilter;
     //needed for use with spring Data JPA sPEL  
     @Bean
     public SecurityEvaluationContextExtension securityEvaluationContextExtension(){
@@ -72,6 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //        http.addFilterBefore(restHeaderAuthFilter(authenticationManager()),
 //                UsernamePasswordAuthenticationFilter.class)
 //                .csrf().disable();
+
+http.addFilterBefore(google2faFilter,  SessionManagementFilter.class);
 http
         .authorizeRequests(authorize -> {
                     authorize

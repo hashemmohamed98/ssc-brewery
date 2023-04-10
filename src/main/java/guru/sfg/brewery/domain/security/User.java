@@ -5,6 +5,7 @@
 package guru.sfg.brewery.domain.security;
 //
 import guru.sfg.brewery.domain.Customer;
+import java.sql.Timestamp;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
@@ -20,6 +21,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.Singular;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.CredentialsContainer;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -72,6 +75,14 @@ private  Boolean credentialsNonExpired= true;
 @Builder.Default
 private  Boolean enabled= true;
 
+@Builder.Default
+private Boolean useGoogle2fa= false;
+
+private String google2faSecret;
+
+@Transient
+private Boolean google2faRequired = true ;
+
     @Override
     public boolean isAccountNonExpired() {
                 return this.accountNonExpired;
@@ -97,5 +108,12 @@ private  Boolean enabled= true;
     public void eraseCredentials() {
             this.password=null;
     }
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private Timestamp createdDate;
+    
+    @UpdateTimestamp
+    private Timestamp lastModifiedDate;
 
 }
